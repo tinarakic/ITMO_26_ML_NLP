@@ -4,7 +4,8 @@ MODEL_SERVER_URL = "http://model-server:8000/generate"
 
 
 AVAILABLE_MODELS = [
-    "Qwen2.5-1.5B"
+    "qwen",
+    "default"
 ]
 
 LANGUAGES = [
@@ -20,7 +21,10 @@ LANGUAGES = [
 
 
 def build_translation_prompt(poem: str, target_language: str) -> str:
-    return f"""Translate the following Russian verses into {target_language}.
+    return f"""
+You are a professional literary translator.
+
+Translate the Russian poem into {target_language}.
 
 Requirements:
 - Preserve the Russian sentence structure as closely as possible.
@@ -37,14 +41,11 @@ Here's the Russian verses:
 """
 
 
-def extract_translation(response_text: str, prompt: str) -> str:
-    cleaned = response_text.strip()
-    prompt_clean = prompt.strip()
-
-    if cleaned.startswith(prompt_clean):
-        cleaned = cleaned[len(prompt_clean):].strip()
-
-    return cleaned
+def extract_translation(response_text: str) -> str:
+    """
+    Model server returns full text — we return it directly.
+    """
+    return response_text.strip()
 
 
 def translate_poem(poem: str, target_language: str, model: str = "qwen") -> str:
@@ -70,4 +71,4 @@ def translate_poem(poem: str, target_language: str, model: str = "qwen") -> str:
     if "text" not in data:
         raise RuntimeError(f"Invalid response format: {data}")
 
-    return extract_translation(data["text"], prompt)
+    return extract_translation(data["text"])
