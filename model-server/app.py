@@ -31,24 +31,26 @@ class Request(BaseModel):
 @app.post("/generate")
 def generate(req: Request):
 
-    inputs = tokenizer(
-        req.prompt,
-        return_tensors="pt"
-    )
-
+    inputs = tokenizer(req.prompt, return_tensors="pt")
     inputs = {k: v.to(device) for k, v in inputs.items()}
+
+    input_len = inputs["input_ids"].shape[1]
 
     with torch.no_grad():
         output = model.generate(
             **inputs,
             max_new_tokens=300,
             do_sample=True,
-            temperature=0.7,
-            top_p=0.9,
-            repetition_penalty=1.1,
+            temperature=0.35,
+            top_p=0.85,
+            repetition_penalty=1.12,
+            no_repeat_ngram_size=3,
             pad_token_id=tokenizer.eos_token_id
         )
 
-    text = tokenizer.decode(output[0], skip_special_tokens=True)
+    # ONLY take generated tokens (not the prompt)
+    generated_tokens = output[0][input_len:]
 
-    return {"text": text}
+    text = tokenizer.decode(generated_tokens, skip_special_tokens=True)
+
+    return {"text": text.strip()}
