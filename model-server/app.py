@@ -64,8 +64,7 @@ def generate(req: Request):
             top_p=0.85,
             repetition_penalty=1.12,
             no_repeat_ngram_size=3,
-            pad_token_id=tokenizer.eos_token_id,
-            eos_token_id=tokenizer.eos_token_id
+            pad_token_id=tokenizer.eos_token_id
         )
 
     generated_tokens = output[0][inputs["input_ids"].shape[-1]:]
