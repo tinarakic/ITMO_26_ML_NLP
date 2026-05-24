@@ -6,7 +6,7 @@ import os
 
 app = FastAPI()
 
-MODEL_NAME = "Qwen/Qwen2.5-1.5B-Instruct"
+MODEL_NAME = "Qwen/Qwen2.5-1.5B-Instruct"  
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -24,7 +24,6 @@ model = AutoModelForCausalLM.from_pretrained(
 
 model.eval()
 
-
 class Request(BaseModel):
     prompt: str
 
@@ -32,37 +31,24 @@ class Request(BaseModel):
 @app.post("/generate")
 def generate(req: Request):
 
-    messages = [
-        {
-            "role": "system",
-            "content": "You are a professional literary translator."
-        },
-        {
-            "role": "user",
-            "content": req.prompt
-        }
-    ]
-
-    inputs = tokenizer.apply_chat_template(
-        messages,
-        return_tensors="pt",
-        add_generation_prompt=True
+    inputs = tokenizer(
+        req.prompt,
+        return_tensors="pt"
     )
 
-    inputs = {k: v.to(model.device) for k, v in inputs.items()}
+    inputs = {k: v.to(device) for k, v in inputs.items()}
 
     with torch.no_grad():
         output = model.generate(
             **inputs,
-            temperature=0.35,
-            top_p=0.85,
-            repetition_penalty=1.12,
-            no_repeat_ngram_size=3,
-            pad_token_id=tokenizer.eos_token_id,
-            eos_token_id=tokenizer.eos_token_id
+            max_new_tokens=300,
+            do_sample=True,
+            temperature=0.7,
+            top_p=0.9,
+            repetition_penalty=1.1,
+            pad_token_id=tokenizer.eos_token_id
         )
 
-    generated_tokens = output[0][inputs["input_ids"].shape[-1]:]
-    text = tokenizer.decode(generated_tokens, skip_special_tokens=True)
+    text = tokenizer.decode(output[0], skip_special_tokens=True)
 
-    return {"text": text.strip()}
+    return {"text": text}
