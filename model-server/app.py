@@ -8,6 +8,8 @@ app = FastAPI()
 
 MODEL_NAME = "Qwen/Qwen2.5-1.5B-Instruct"  
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
 tokenizer = AutoTokenizer.from_pretrained(
     MODEL_NAME,
     token=os.environ["HF_TOKEN"]
@@ -15,10 +17,12 @@ tokenizer = AutoTokenizer.from_pretrained(
 
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_NAME,
-    torch_dtype=torch.float16,
-    device_map="cuda" if torch.cuda.is_available() else "cpu",
+    dtype=torch.float16 if device == "cuda" else torch.float32,
+    device_map={"": 0} if device == "cuda" else None,
     token=os.environ["HF_TOKEN"]
 )
+
+model.eval()
 
 class Request(BaseModel):
     prompt: str
