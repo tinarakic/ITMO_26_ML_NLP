@@ -1,4 +1,5 @@
 import requests
+import re
 
 MODEL_SERVER_URL = "http://model-server:8000/generate"
 
@@ -20,7 +21,7 @@ LANGUAGES = [
 
 
 def build_translation_prompt(poem: str, target_language: str) -> str:
-    return f"""
+   return f"""
 Translate the Russian poem into {target_language}.
 
 Requirements:
@@ -37,12 +38,24 @@ Here's the Russian verses:
 {poem}
 """
 
-
 def extract_translation(response_text: str) -> str:
     """
-    Model server returns full text — we return it directly.
+    Normalize model output and force proper line breaks.
     """
-    return response_text.strip()
+
+    text = response_text.strip()
+
+    # normalize Windows/mac newlines
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+
+    # split into lines
+    lines = [line.strip() for line in text.split("\n")]
+
+    # remove empty lines
+    lines = [line for line in lines if line]
+
+    # join back with proper line breaks
+    return "\n".join(lines)
 
 
 def translate_poem(poem: str, target_language: str, model: str = "qwen") -> str:
