@@ -32,15 +32,10 @@ class Request(BaseModel):
 @app.post("/generate")
 def generate(req: Request):
 
-    if not req.prompt.strip():
-        return {"text": ""}
-
     messages = [
         {
             "role": "system",
-            "content": (
-                "You are a professional literary translator. "
-            )
+            "content": "You are a professional literary translator."
         },
         {
             "role": "user",
@@ -48,15 +43,14 @@ def generate(req: Request):
         }
     ]
 
-    text_input = tokenizer.apply_chat_template(
+    inputs = tokenizer.apply_chat_template(
         messages,
-        tokenize=False,
+        return_tensors="pt",
         add_generation_prompt=True
     )
 
-    inputs = tokenizer(text_input, return_tensors="pt")
-    inputs = {k: v.to(device) for k, v in inputs.items()}
-
+    inputs = {k: v.to(model.device) for k, v in inputs.items()}
+    
     with torch.no_grad():
         output = model.generate(
             **inputs,
