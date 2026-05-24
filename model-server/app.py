@@ -60,16 +60,14 @@ def generate(req: Request):
     with torch.no_grad():
         output = model.generate(
             **inputs,
-            max_new_tokens=300,
-            do_sample=False,              # deterministic output
-            temperature=0.3,
-            top_p=0.9,
-            repetition_penalty=1.1,
+            temperature=0.35,
+            top_p=0.85,
+            repetition_penalty=1.12,
+            no_repeat_ngram_size=3,
             pad_token_id=tokenizer.eos_token_id,
             eos_token_id=tokenizer.eos_token_id
         )
 
-    # IMPORTANT: remove prompt tokens from output
     generated_tokens = output[0][inputs["input_ids"].shape[-1]:]
     text = tokenizer.decode(generated_tokens, skip_special_tokens=True)
 
