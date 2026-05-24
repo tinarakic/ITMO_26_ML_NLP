@@ -21,8 +21,6 @@ LANGUAGES = [
 
 def build_translation_prompt(poem: str, target_language: str) -> str:
     return f"""
-You are a professional literary translator.
-
 Translate the following Russian verses into {target_language}.
 
 Requirements:
@@ -34,8 +32,8 @@ Requirements:
 - Do NOT explain.
 - Output ONLY the translated verses.
 - Do not lose any of the original verse parts.
-- Return text with line breaks.
-- Preserve "\n" symbols in the translation.
+- Return text with original line breaks.
+- Preserve verse structure.
 
 Here's the Russian verses:
 {poem}
