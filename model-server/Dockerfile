@@ -17,10 +17,7 @@ RUN pip install --no-cache-dir \
 
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir \
-    "transformers==4.36.2" \
-    "accelerate==0.25.0" \
-    "numpy<2"
+RUN pip install --no-cache-dir -r requirements.txt
 
 # App code
 COPY app.py .
