@@ -34,7 +34,9 @@ def generate(req: Request):
     inputs = tokenizer(
         req.prompt,
         return_tensors="pt"
-    ).to(model.device)
+    )
+
+    inputs = {k: v.to(device) for k, v in inputs.items()}
 
     with torch.no_grad():
         output = model.generate(
