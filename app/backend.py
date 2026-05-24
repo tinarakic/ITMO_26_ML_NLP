@@ -32,8 +32,10 @@ Requirements:
 - Do NOT explain.
 - Output ONLY the translated verses.
 - Do not lose any of the original verse parts.
-- Return text with original line breaks.
-- Preserve verse structure.
+- Preserve EXACT line breaks.
+- Each input line must correspond to one output line.
+- Do NOT merge or split lines.
+- Do NOT add or remove lines.
 
 Here's the Russian verses:
 {poem}
