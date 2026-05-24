@@ -20,22 +20,17 @@ LANGUAGES = [
 
 
 def build_translation_prompt(poem: str, target_language: str) -> str:
-    return f"""
-Translate the following Russian verses into {target_language}.
+    return f"""Translate the following Russian verses into {target_language}.
 
 Requirements:
 - Preserve the Russian sentence structure as closely as possible.
 - Keep the poetic style and rhythm.
 - Preserve imagery and symbolism.
 - Prefer poetic diction over literal prose.
-- Do NOT summarize.
-- Do NOT explain.
+- Do NOT summarize NOR explain.
 - Output ONLY the translated verses.
-- Do not lose any of the original verse parts.
 - Preserve EXACT line breaks.
 - Each input line must correspond to one output line.
-- Do NOT merge or split lines.
-- Do NOT add or remove lines.
 
 Here's the Russian verses:
 {poem}
