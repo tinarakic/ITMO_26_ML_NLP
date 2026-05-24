@@ -14,11 +14,8 @@ services:
 
     restart: unless-stopped
 
-    device_requests:
-      - driver: nvidia
-        count: all
-        capabilities: [gpu]
-
+    gpus: all
+    
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
