@@ -1,39 +1,29 @@
+version: "3.9"
+
 services:
 
-  vllm-qwen:
-    image: vllm/vllm-openai:latest
-
-    container_name: vllm-qwen
+  model-server:
+    build: ./model-server
+    container_name: model-server
 
     runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
 
     ports:
       - "8000:8000"
-
-    volumes:
-      - ~/.cache/huggingface:/root/.cache/huggingface
-
-    environment:
-      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}
-
-    command: >
-      --model Qwen/Qwen2.5-7B-Instruct
-      --gpu-memory-utilization 0.85
-      --max-model-len 4096
-      --api-key EMPTY
 
     restart: unless-stopped
 
 
   poetry-app:
     build: ./app
-
     container_name: poetry-app
 
     ports:
       - "8501:8501"
 
     depends_on:
-      - vllm-qwen
+      - model-server
 
     restart: unless-stopped
