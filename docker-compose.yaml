@@ -5,15 +5,26 @@ services:
   model-server:
     build: ./model-server
     container_name: model-server
-    runtime: nvidia
 
     ports:
-        - "8000:8000"
+      - "8000:8000"
 
     env_file:
-        - .env
+      - .env
 
     restart: unless-stopped
+
+    device_requests:
+      - driver: nvidia
+        count: all
+        capabilities: [gpu]
+
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
 
 
   poetry-app:
