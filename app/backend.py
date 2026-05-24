@@ -4,8 +4,7 @@ MODEL_SERVER_URL = "http://model-server:8000/generate"
 
 
 AVAILABLE_MODELS = [
-    "qwen",
-    "default"
+    "qwen"
 ]
 
 LANGUAGES = [
@@ -22,8 +21,6 @@ LANGUAGES = [
 
 def build_translation_prompt(poem: str, target_language: str) -> str:
     return f"""
-You are a professional literary translator.
-
 Translate the Russian poem into {target_language}.
 
 Requirements:
