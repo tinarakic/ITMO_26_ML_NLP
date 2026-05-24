@@ -31,20 +31,28 @@ class Request(BaseModel):
 @app.post("/generate")
 def generate(req: Request):
 
-    inputs = tokenizer(
-    req.prompt,
-    return_tensors="pt"
-    )
+    messages = [
+    {"role": "system", "content": "You are a professional literary translator."},
+    {"role": "user", "content": req.prompt}
+    ]
     
+    text = tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=True
+    )
+
+    inputs = tokenizer(text, return_tensors="pt")
     inputs = {k: v.to(device) for k, v in inputs.items()}
+    
     input_len = inputs["input_ids"].shape[1]
 
     with torch.no_grad():
         output = model.generate(
             **inputs,
             max_new_tokens=300,
-            do_sample=False,
-            # temperature=0.35,
+            do_sample=True,
+            temperature=0.35,
             top_p=0.85,
             repetition_penalty=1.12,
             no_repeat_ngram_size=3,
