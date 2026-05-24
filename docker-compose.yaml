@@ -18,31 +18,12 @@ services:
 
     command: >
       --model Qwen/Qwen2.5-7B-Instruct
-      --gpu-memory-utilization 0.45
+      --gpu-memory-utilization 0.85
       --max-model-len 4096
       --api-key EMPTY
 
-  vllm-mistral:
-    image: vllm/vllm-openai:latest
+    restart: unless-stopped
 
-    container_name: vllm-mistral
-
-    runtime: nvidia
-
-    ports:
-      - "8001:8000"
-
-    volumes:
-      - ~/.cache/huggingface:/root/.cache/huggingface
-
-    environment:
-      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}
-
-    command: >
-      --model mistralai/Mistral-7B-Instruct-v0.3
-      --gpu-memory-utilization 0.45
-      --max-model-len 4096
-      --api-key EMPTY
 
   poetry-app:
     build: ./app
@@ -54,4 +35,5 @@ services:
 
     depends_on:
       - vllm-qwen
-      - vllm-mistral
+
+    restart: unless-stopped
