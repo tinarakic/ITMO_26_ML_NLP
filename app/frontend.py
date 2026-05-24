@@ -169,7 +169,7 @@ if translate_button:
             )
 
         st.subheader("Translation")
-        st.write(translation)
+        st.text(translation)
 
         with st.expander("Prompt used"):
             st.code(build_translation_prompt(poem, target_language))
