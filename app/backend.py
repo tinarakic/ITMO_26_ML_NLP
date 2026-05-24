@@ -6,10 +6,6 @@ MODEL_ENDPOINTS = {
         "model": "Qwen/Qwen2.5-7B-Instruct",
         "base_url": "http://vllm-qwen:8000/v1",
     },
-    "Mistral 7B": {
-        "model": "mistralai/Mistral-7B-Instruct-v0.3",
-        "base_url": "http://vllm-mistral:8000/v1",
-    },
 }
 
 
