@@ -43,8 +43,8 @@ def generate(req: Request):
         output = model.generate(
             **inputs,
             max_new_tokens=300,
-            do_sample=True,
-            temperature=0.35,
+            do_sample=False,
+            # temperature=0.35,
             top_p=0.85,
             repetition_penalty=1.12,
             no_repeat_ngram_size=3,
