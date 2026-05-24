@@ -122,11 +122,22 @@ st.write(
 with st.sidebar:
     st.header("Settings")
 
-    selected_model = st.selectbox(
-        "Model",
-        AVAILABLE_MODELS,
-        index=0,
-    )
+    selected_model = AVAILABLE_MODELS[0]
+
+    st.markdown(
+    f"""
+    <div style="
+        background-color: rgba(255,255,255,0.78);
+        padding: 0.7rem 1rem;
+        border-radius: 12px;
+        border: 1px solid rgba(120, 90, 60, 0.35);
+        margin-bottom: 1rem;
+    ">
+        <strong>Model:</strong> {selected_model}
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
     target_language = st.selectbox(
         "Target language",

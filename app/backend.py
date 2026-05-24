@@ -4,8 +4,7 @@ MODEL_SERVER_URL = "http://model-server:8000/generate"
 
 
 AVAILABLE_MODELS = [
-    "qwen",
-    "default"
+    "Qwen2.5-1.5B"
 ]
 
 LANGUAGES = [
@@ -24,31 +23,33 @@ def build_translation_prompt(poem: str, target_language: str) -> str:
     return f"""
 You are a professional literary translator.
 
-Translate the Russian poem into {target_language}.
+Translate the following Russian verses into {target_language}.
 
-Rules:
-- preserve the original meaning as accurately as possible;
-- preserve emotional tone and poetic imagery;
-- make the result sound natural and poetic in {target_language};
-- do not add a title;
-- do not add explanations;
-- do not invent new metaphors that are not present in the original;
-- preserve line breaks as closely as possible;
-- return only the translated poem.
+Requirements:
+- Preserve the Russian sentence structure as closely as possible.
+- Keep the poetic style and rhythm.
+- Preserve imagery and symbolism.
+- Prefer poetic diction over literal prose.
+- Do NOT summarize.
+- Do NOT explain.
+- Output ONLY the translated verses.
+- Do not lose any of the original verse parts.
+- Return text with line breaks.
+- Preserve "\n" symbols in the translation.
 
-Important:
-The translation should be poetic, but semantic accuracy is more important than rhyme.
-
-Poem:
+Here's the Russian verses:
 {poem}
 """
 
 
-def extract_translation(response_text: str) -> str:
-    """
-    Model server returns full text — we return it directly.
-    """
-    return response_text.strip()
+def extract_translation(response_text: str, prompt: str) -> str:
+    cleaned = response_text.strip()
+    prompt_clean = prompt.strip()
+
+    if cleaned.startswith(prompt_clean):
+        cleaned = cleaned[len(prompt_clean):].strip()
+
+    return cleaned
 
 
 def translate_poem(poem: str, target_language: str, model: str = "qwen") -> str:
@@ -74,4 +75,4 @@ def translate_poem(poem: str, target_language: str, model: str = "qwen") -> str:
     if "text" not in data:
         raise RuntimeError(f"Invalid response format: {data}")
 
-    return extract_translation(data["text"])
+    return extract_translation(data["text"], prompt)
