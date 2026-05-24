@@ -6,29 +6,19 @@ import os
 
 app = FastAPI()
 
-MODEL_NAME = "Qwen/Qwen3.5-2B"
-
+MODEL_NAME = "Qwen/Qwen2.5-1.5B-Instruct"  
 
 tokenizer = AutoTokenizer.from_pretrained(
     MODEL_NAME,
     token=os.environ["HF_TOKEN"]
 )
 
-
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_NAME,
     torch_dtype=torch.float16,
-    device_map="auto",
+    device_map="cuda" if torch.cuda.is_available() else "cpu",
     token=os.environ["HF_TOKEN"]
 )
-
-
-def get_device():
-    if hasattr(model, "device"):
-        return model.device
-    
-    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
 class Request(BaseModel):
     prompt: str
@@ -36,24 +26,20 @@ class Request(BaseModel):
 
 @app.post("/generate")
 def generate(req: Request):
-    device = get_device()
 
     inputs = tokenizer(
         req.prompt,
         return_tensors="pt"
-    )
-
-    inputs = {k: v.to(device) for k, v in inputs.items()}
+    ).to(model.device)
 
     with torch.no_grad():
         output = model.generate(
             **inputs,
-            max_new_tokens=500,
+            max_new_tokens=300,
             do_sample=True,
-            temperature=0.35,
-            top_p=0.85,
-            repetition_penalty=1.12,
-            no_repeat_ngram_size=3,
+            temperature=0.7,
+            top_p=0.9,
+            repetition_penalty=1.1,
             pad_token_id=tokenizer.eos_token_id
         )
 

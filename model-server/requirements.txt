@@ -1,6 +1,5 @@
 fastapi
-uvicorn[standard]
-transformers==4.41.2
-accelerate==0.30.1
+uvicorn
+transformers
+accelerate
 sentencepiece
-numpy<2
