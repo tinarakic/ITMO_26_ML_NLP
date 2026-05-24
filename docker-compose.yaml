@@ -5,13 +5,13 @@ services:
   model-server:
     build: ./model-server
     container_name: model-server
-
     runtime: nvidia
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=0
 
     ports:
-      - "8000:8000"
+        - "8000:8000"
+
+    env_file:
+        - .env
 
     restart: unless-stopped
 
