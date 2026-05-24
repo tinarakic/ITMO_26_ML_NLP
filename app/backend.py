@@ -1,16 +1,12 @@
-from openai import OpenAI
+import requests
+
+MODEL_SERVER_URL = "http://model-server:8000/generate"
 
 
-MODEL_ENDPOINTS = {
-    "Qwen 7B": {
-        "model": "Qwen/Qwen2.5-7B-Instruct",
-        "base_url": "http://vllm-qwen:8000/v1",
-    },
-}
-
-
-AVAILABLE_MODELS = list(MODEL_ENDPOINTS.keys())
-
+AVAILABLE_MODELS = [
+    "qwen",
+    "default"
+]
 
 LANGUAGES = [
     "English",
@@ -22,13 +18,6 @@ LANGUAGES = [
     "Japanese",
     "Korean",
 ]
-
-
-def get_client(base_url: str):
-    return OpenAI(
-        base_url=base_url,
-        api_key="EMPTY",
-    )
 
 
 def build_translation_prompt(poem: str, target_language: str) -> str:
@@ -43,48 +32,46 @@ Rules:
 - make the result sound natural and poetic in {target_language};
 - do not add a title;
 - do not add explanations;
-- do not invent new metaphors;
-- preserve line breaks;
+- do not invent new metaphors that are not present in the original;
+- preserve line breaks as closely as possible;
 - return only the translated poem.
+
+Important:
+The translation should be poetic, but semantic accuracy is more important than rhyme.
 
 Poem:
 {poem}
 """
 
 
-def extract_message_text(response) -> str:
-    message = response.choices[0].message
-
-    if message.content:
-        return message.content.strip()
-
-    return "Model returned empty response."
+def extract_translation(response_text: str) -> str:
+    """
+    Model server returns full text — we return it directly.
+    """
+    return response_text.strip()
 
 
-def translate_poem(poem: str, target_language: str, model: str) -> str:
-    if model not in MODEL_ENDPOINTS:
-        raise ValueError("Unknown model.")
-
-    model_config = MODEL_ENDPOINTS[model]
-
-    client = get_client(model_config["base_url"])
+def translate_poem(poem: str, target_language: str, model: str = "qwen") -> str:
+    if not poem.strip():
+        raise ValueError("Poem is empty.")
 
     prompt = build_translation_prompt(poem, target_language)
 
-    response = client.chat.completions.create(
-        model=model_config["model"],
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a professional literary translator.",
-            },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-        temperature=0.8,
-        max_tokens=1000,
-    )
+    try:
+        response = requests.post(
+            MODEL_SERVER_URL,
+            json={"prompt": prompt},
+            timeout=180
+        )
+    except Exception as e:
+        raise RuntimeError(f"Request failed: {str(e)}")
 
-    return extract_message_text(response)
+    if response.status_code != 200:
+        raise RuntimeError(f"Model server error: {response.text}")
+
+    data = response.json()
+
+    if "text" not in data:
+        raise RuntimeError(f"Invalid response format: {data}")
+
+    return extract_translation(data["text"])
