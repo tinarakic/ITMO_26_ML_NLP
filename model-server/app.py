@@ -52,7 +52,7 @@ def generate(req: Request):
             **inputs,
             max_new_tokens=300,
             do_sample=True,
-            temperature=0.35,
+            temperature=0.5,
             top_p=0.85,
             repetition_penalty=1.12,
             no_repeat_ngram_size=3,
