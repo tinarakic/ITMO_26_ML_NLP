@@ -5,7 +5,7 @@ MODEL_SERVER_URL = "http://model-server:8000/generate"
 
 
 AVAILABLE_MODELS = [
-    "qwen"
+    "Qwen2.5-1.5B-Instruct"
 ]
 
 LANGUAGES = [
