@@ -6,7 +6,7 @@ import os
 
 app = FastAPI()
 
-MODEL_NAME = "Qwen/Qwen2.5-7B-Instruct"
+MODEL_NAME = "Qwen/Qwen3.5-2B"
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModelForCausalLM.from_pretrained(
@@ -27,7 +27,12 @@ def generate(req: Request):
         output = model.generate(
             **inputs,
             max_new_tokens=500,
-            temperature=0.7
+            do_sample=True,
+            temperature=0.35,
+            top_p=0.85,
+            repetition_penalty=1.12,
+            no_repeat_ngram_size=3,
+            pad_token_id=tokenizer.eos_token_id
         )
 
     text = tokenizer.decode(output[0], skip_special_tokens=True)
